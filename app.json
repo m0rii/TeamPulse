@@ -1,0 +1,38 @@
+{
+  "name": "TeamPulse",
+  "description": "A Slack bot for team status tracking and management with multiple team managers",
+  "keywords": [
+    "java",
+    "spring-boot",
+    "slack",
+    "bot"
+  ],
+  "env": {
+    "SLACK_SIGNING_SECRET": {
+      "description": "Slack signing secret for request verification",
+      "required": true
+    },
+    "SLACK_BOT_TOKEN": {
+      "description": "Slack bot token for API operations",
+      "required": true
+    },
+    "CLOUDFLARE_ACCOUNT_ID": {
+      "description": "Cloudflare account ID",
+      "required": true
+    },
+    "CLOUDFLARE_NAMESPACE_ID": {
+      "description": "Cloudflare KV namespace ID",
+      "required": true
+    },
+    "CLOUDFLARE_API_TOKEN": {
+      "description": "Cloudflare API token",
+      "required": true
+    }
+  },
+  "addons": [],
+  "buildpacks": [
+    {
+      "url": "heroku/java"
+    }
+  ]
+} 
