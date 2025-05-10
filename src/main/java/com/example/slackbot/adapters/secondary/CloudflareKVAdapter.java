@@ -58,4 +58,44 @@ public class CloudflareKVAdapter {
 
         return statuses;
     }
+    
+    /**
+     * Get a value from Cloudflare KV
+     * @param key The key to retrieve
+     * @return The value associated with the key, or null if not found
+     */
+    public String get(String key) {
+        return client.get()
+            .uri("/accounts/{acct}/storage/kv/namespaces/{ns}/values/{key}", accountId, namespaceId, key)
+            .retrieve()
+            .bodyToMono(String.class)
+            .onErrorReturn(null)  // Return null on error
+            .block();
+    }
+    
+    /**
+     * Put a value into Cloudflare KV
+     * @param key The key to store
+     * @param value The value to store
+     */
+    public void put(String key, String value) {
+        client.put()
+            .uri("/accounts/{acct}/storage/kv/namespaces/{ns}/values/{key}", accountId, namespaceId, key)
+            .bodyValue(value)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .subscribe();
+    }
+    
+    /**
+     * Delete a value from Cloudflare KV
+     * @param key The key to delete
+     */
+    public void delete(String key) {
+        client.delete()
+            .uri("/accounts/{acct}/storage/kv/namespaces/{ns}/values/{key}", accountId, namespaceId, key)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .subscribe();
+    }
 } 

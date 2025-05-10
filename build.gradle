@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.example'
-version = '0.0.1-SNAPSHOT'
+version = '0.1.0'
 sourceCompatibility = '21'
 
 repositories {
@@ -27,17 +27,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    systemProperty 'spring.profiles.active', 'test'
+    // Exclude integration tests from the regular test task
+    exclude '**/*IntegrationTest*'
 }
 
+// Custom task for running integration tests
 task integrationTest(type: Test) {
-    description = 'Runs the integration tests.'
-    group = 'verification'
-    testClassesDirs = sourceSets.test.output.classesDirs
-    classpath = sourceSets.test.runtimeClasspath
-    shouldRunAfter test
-    
-    // Only run the integration test
-    include '**/SlackBotIntegrationTest.class'
+    useJUnitPlatform()
+    // Do not override spring.profiles.active to avoid conflicts
+    // Only run integration tests
+    include '**/*IntegrationTest*'
 }
 
 // Custom task to clean, build, and run all tests

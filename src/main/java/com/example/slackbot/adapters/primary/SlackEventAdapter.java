@@ -1,7 +1,9 @@
 package com.example.slackbot.adapters.primary;
 
 import com.example.slackbot.application.DailyStatusService;
+import com.example.slackbot.application.TeamService;
 import com.example.slackbot.domain.DailyStatus;
+import com.example.slackbot.domain.Team;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.jakarta_servlet.SlackAppServlet;
 import com.slack.api.methods.response.views.ViewsOpenResponse;
@@ -20,16 +22,19 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class SlackEventAdapter {
     private final App app;
     private final DailyStatusService dailyStatusService;
+    private final TeamService teamService;
 
     @Autowired
-    public SlackEventAdapter(App app, DailyStatusService dailyStatusService) {
+    public SlackEventAdapter(App app, DailyStatusService dailyStatusService, TeamService teamService) {
         this.app = app;
         this.dailyStatusService = dailyStatusService;
+        this.teamService = teamService;
     }
 
     @PostConstruct
@@ -70,15 +75,83 @@ public class SlackEventAdapter {
             
             dailyStatusService.addDailyStatus(status);
             
+            // Associate the status with the user's teams
+            List<Team> userTeams = teamService.getTeamsByUserId(userId);
+            for (Team team : userTeams) {
+                dailyStatusService.associateStatusWithTeam(userId, team.getId());
+            }
+            
             return ctx.ack();
         });
 
-        // Handle slash command
+        // Handle slash command for all status
         app.command("/status", (req, ctx) -> {
+            String text = req.getPayload().getText();
+            String userId = req.getPayload().getUserId();
             String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-            List<DailyStatus> statuses = dailyStatusService.getDailyStatuses(date);
             
-            return ctx.ack(r -> r.text(createStatusSummaryText(statuses)));
+            if (text.isEmpty()) {
+                // Show status for all teams the user is part of
+                List<Team> userTeams = teamService.getTeamsByUserId(userId);
+                
+                if (userTeams.isEmpty()) {
+                    return ctx.ack("You are not a member of any team. Join a team first or create one with '/team create'.");
+                }
+                
+                StringBuilder response = new StringBuilder("*Your Teams Status Summary:*\n\n");
+                
+                for (Team team : userTeams) {
+                    response.append("*Team: ").append(team.getName()).append("*\n");
+                    List<DailyStatus> teamStatuses = dailyStatusService.getTeamDailyStatuses(date, team.getId());
+                    response.append(createStatusSummaryText(teamStatuses));
+                    response.append("\n");
+                }
+                
+                return ctx.ack(response.toString());
+            } else if (text.startsWith("team ")) {
+                // Show status for a specific team
+                String teamId = text.substring(5).trim();
+                Optional<Team> teamOpt = teamService.getTeamById(teamId);
+                
+                if (!teamOpt.isPresent()) {
+                    return ctx.ack("Team not found with ID: " + teamId);
+                }
+                
+                Team team = teamOpt.get();
+                
+                // Check if user has permission to view this team's status
+                if (!team.isMember(userId) && !team.isManager(userId)) {
+                    return ctx.ack("You don't have permission to view this team's status.");
+                }
+                
+                List<DailyStatus> teamStatuses = dailyStatusService.getTeamDailyStatuses(date, teamId);
+                String response = "*Team " + team.getName() + " Status Summary:*\n\n" + createStatusSummaryText(teamStatuses);
+                
+                return ctx.ack(response);
+            } else {
+                // Assume it's a user ID and check permissions
+                String targetUserId = text.trim();
+                
+                if (!dailyStatusService.hasViewPermission(userId, targetUserId)) {
+                    return ctx.ack("You don't have permission to view this user's status.");
+                }
+                
+                List<DailyStatus> statuses = dailyStatusService.getDailyStatuses(date);
+                List<DailyStatus> filteredStatuses = new ArrayList<>();
+                
+                for (DailyStatus status : statuses) {
+                    if (status.getDeveloperId().equals(targetUserId)) {
+                        filteredStatuses.add(status);
+                        break;
+                    }
+                }
+                
+                if (filteredStatuses.isEmpty()) {
+                    return ctx.ack("<@" + targetUserId + "> has not submitted a status update today.");
+                }
+                
+                return ctx.ack("*Status for <@" + targetUserId + ">:*\n\n" + createStatusSummaryText(filteredStatuses));
+            }
         });
     }
 
@@ -121,7 +194,11 @@ public class SlackEventAdapter {
     }
 
     private String createStatusSummaryText(List<DailyStatus> statuses) {
-        StringBuilder summary = new StringBuilder("*Today's Team Status*\n\n");
+        if (statuses.isEmpty()) {
+            return "No status updates available.\n";
+        }
+
+        StringBuilder summary = new StringBuilder();
         
         for (DailyStatus status : statuses) {
             summary.append("*<@").append(status.getDeveloperId()).append(">*\n");

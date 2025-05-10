@@ -2,6 +2,8 @@ package com.example.slackbot.application.impl;
 
 import com.example.slackbot.domain.DailyStatus;
 import com.example.slackbot.adapters.secondary.CloudflareKVAdapter;
+import com.example.slackbot.application.TeamService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -15,11 +17,15 @@ import com.example.slackbot.application.impl.DailyStatusServiceImpl;
 class DailyStatusServiceImplTest {
     private DailyStatusServiceImpl service;
     private CloudflareKVAdapter cloudflareKVAdapter;
+    private TeamService teamService;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         cloudflareKVAdapter = Mockito.mock(CloudflareKVAdapter.class);
-        service = new DailyStatusServiceImpl(cloudflareKVAdapter);
+        teamService = Mockito.mock(TeamService.class);
+        objectMapper = Mockito.mock(ObjectMapper.class);
+        service = new DailyStatusServiceImpl(cloudflareKVAdapter, teamService, objectMapper);
     }
 
     @Test

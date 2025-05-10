@@ -1,12 +1,19 @@
 slack:
-  signingSecret: "<your-slack-signing-secret>"
-  botToken: "<your-slack-bot-token>"
+  signingSecret: ${SLACK_SIGNING_SECRET}
+  botToken: ${SLACK_BOT_TOKEN}
 
 cloudflare:
-  accountId: "<your-cloudflare-account-id>"
-  namespaceId: "<your-cloudflare-namespace-id>"
-  apiToken: "<your-cloudflare-api-token>"
+  accountId: ${CLOUDFLARE_ACCOUNT_ID}
+  namespaceId: ${CLOUDFLARE_NAMESPACE_ID}
+  apiToken: ${CLOUDFLARE_API_TOKEN}
 
 scheduling:
-  timezone: "CET"
-  dailyReminderTime: "09:00" 
+  timezone: ${SCHEDULING_TIMEZONE:CET}
+  dailyReminderTime: ${SCHEDULING_REMINDER_TIME:09:00}
+
+microsoft:
+  clientId: ${MICROSOFT_CLIENT_ID}
+  clientSecret: ${MICROSOFT_CLIENT_SECRET}
+  tenantId: ${MICROSOFT_TENANT_ID}
+  timezone: ${MICROSOFT_TIMEZONE:UTC}
+  dateTimeFormat: "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
