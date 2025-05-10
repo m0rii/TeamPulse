@@ -1,0 +1,17 @@
+# Slack API credentials
+# Get these from your Slack App configuration page at https://api.slack.com/apps
+SLACK_SIGNING_SECRET=your_slack_signing_secret
+SLACK_BOT_TOKEN=xoxb-your_slack_bot_token
+
+# Cloudflare KV credentials
+# Get these from your Cloudflare account at https://dash.cloudflare.com/
+CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+CLOUDFLARE_NAMESPACE_ID=your_cloudflare_namespace_id
+
+# Application settings
+SERVER_PORT=8080
+SPRING_PROFILES_ACTIVE=dev
+
+# Copy this file to .env and fill in your actual values
+# Do not commit the .env file to version control 

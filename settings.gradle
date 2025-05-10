@@ -1,0 +1,12 @@
+rootProject.name = 'teampulse'
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            version('springBoot', '3.3.0')
+            library('springBootStarterWeb', 'org.springframework.boot', 'spring-boot-starter-web').versionRef('springBoot')
+            library('springBootStarterTest', 'org.springframework.boot', 'spring-boot-starter-test').versionRef('springBoot')
+            library('slackBolt', 'com.slack.api', 'bolt').version('1.20.0')
+        }
+    }
+} 

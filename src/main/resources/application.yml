@@ -1,0 +1,12 @@
+slack:
+  signingSecret: "<your-slack-signing-secret>"
+  botToken: "<your-slack-bot-token>"
+
+cloudflare:
+  accountId: "<your-cloudflare-account-id>"
+  namespaceId: "<your-cloudflare-namespace-id>"
+  apiToken: "<your-cloudflare-api-token>"
+
+scheduling:
+  timezone: "CET"
+  dailyReminderTime: "09:00" 
