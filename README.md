@@ -1,6 +1,6 @@
 # TeamPulse: Daily Team Status Bot
 
-TeamPulse is a Spring Boot application that integrates with Slack to help teams manage daily status updates. The bot allows team members to submit their daily status, including availability, tasks, and notes, and provides a summary of all team members' status.
+TeamPulse is a Java 21 / Spring Boot Slack bot that sends a daily check-in modal, saves answers in Cloudflare Workers KV, and shows a live roster via /status. It also detects huddles & presence, runs entirely on Cloudflare's free tier—no servers, no bills.
 
 ## Features
 
@@ -72,14 +72,14 @@ CLOUDFLARE_API_TOKEN=<your-cloudflare-api-token>
 
 ```
 gradlew clean build
-java -jar build/libs/slackbot-0.0.1-SNAPSHOT.jar
+java -jar build/libs/teampulse-0.0.1-SNAPSHOT.jar
 ```
 
 #### Unix-based Systems
 
 ```
 ./gradlew clean build
-java -jar build/libs/slackbot-0.0.1-SNAPSHOT.jar
+java -jar build/libs/teampulse-0.0.1-SNAPSHOT.jar
 ```
 
 ## Deployment to Cloudflare Workers
@@ -128,4 +128,4 @@ The Hexagonal Architecture makes it easy to extend the application:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details. 
+This project is licensed under the MIT License - see the LICENSE file for details.
